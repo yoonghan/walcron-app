@@ -1,0 +1,12 @@
+/* purgecss start ignore */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+
+/* Your own custom component styles */
+
+/* purgecss end ignore */
+@import 'tailwindcss/utilities';
+
+html {
+  font-size: 14pt;
+}
