@@ -21,8 +21,6 @@ export default class MyDocument extends Document<{}> {
           <link rel="apple-touch-icon" href="/pwa/apple-icon.png" />
           <link rel="apple-touch-icon" sizes="152x152" href="/pwa/apple-icon-152x152.png" />
           <link rel="apple-touch-icon" sizes="180x180" href="/pwa/apple-icon-180x180.png" />
-          <link rel="preload" as="style" href="/css/common.css" key="int_common" />
-          <link rel="preload" as="style" href="/css/font.css" key="int_font"/>
           <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>
