@@ -7,15 +7,20 @@ export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [isPermissionRequired, setIsPermissionRequired] = useState(false);
   const [lastestMessage, setLatestMessage] = useState("");
+  const [lastestData, setLatestData] = useState({});
 
   useEffect(() => {
     if(firebaseMessaging !== null && isPushEnabled) {
       console.log("registered to message listener");
       firebaseMessaging.onMessage((payload) => {
         const notification = payload.notification;
+        const data = payload.data;
+        
+        console.log('notification', payload);
         // try {
         //   if(notification.title.indexOf('ready') > -1) {
             setLatestMessage(notification.body);
+            setLatestData(data);
         //   }
         // }catch(err) {
         //
@@ -71,6 +76,7 @@ export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
   return {
     isPermissionRequired: isPermissionRequired,
     isPushEnabled: isPushEnabled,
-    lastestMessage: lastestMessage
+    lastestMessage: lastestMessage,
+    lastestData: lastestData
   };
 }
