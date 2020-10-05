@@ -8,7 +8,11 @@
     }
   ],
   "env": {
-    "USER_ID": "1",
-    "BACKEND_SERVER": "https://service.walcron.com"
+  },
+  "build": {
+    "env": {
+      "USER_ID": "1",
+      "BACKEND_SERVER": "https://service.walcron.com"
+    }
   }
 }

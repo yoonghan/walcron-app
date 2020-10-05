@@ -4,20 +4,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconBox from '../components/IconBox';
 import {withFirebaseCloudMessaging} from '../hooks/firebase';
 import {withOrders} from '../hooks/orders';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 
 const Locker:SFC<any> = ({baseUrl, userId}) => {
   const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(baseUrl, userId);
-  const {orders, updateOrders} = withOrders(baseUrl, userId);
+  const {orders, updateOrders, isFetchingOrder} = withOrders(baseUrl, userId);
   const [myOrders, setMyOrders] = useState([]);
 
   const _drawnOrders = useMemo(() => {
     if(myOrders) {
       return myOrders.map((elem, idx) => (
         <tr key={`order${idx}-${elem.orderId}`}>
+          <td className="border px-4 py-2">{elem.lastModifiedDateTime}</td>
+          <td className={`border px-4 py-2 ${elem.status==='Ready'?'bg-green-500':'bg-blue-500'}`}>{elem.status}</td>
           <td className="border px-4 py-2">{elem.partnerId}</td>
           <td className="border px-4 py-2">{elem.orderId}</td>
-          <td className="border px-4 py-2">{elem.status}</td>
+          <td className="border px-4 py-2">{elem.createdDateTime}</td>
         </tr>
       ))
     }
@@ -26,8 +28,7 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
 
   useEffect(() => {
     const currentOrders = [...orders];
-    console.log('lastestData', lastestData);
-    if(lastestData.orderId && lastestData.orderId !== '') {
+    if(typeof lastestData !== 'undefined') {
       const orderFound = currentOrders.find(element => element.orderId === lastestData.orderId && element.partnerId == lastestData.partnerId);
 
       if(orderFound) {
@@ -47,6 +48,18 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
     setMyOrders(currentOrders);
   }, [orders, lastestData]);
 
+  useEffect(() => {
+    const visibilityChangeFunc = () => {
+      updateOrders();
+    }
+
+    document.addEventListener('visibilitychange', visibilityChangeFunc, false);
+
+    return () => {
+      document.removeEventListener('visibilitychange', visibilityChangeFunc, false);
+    }
+  }, []);
+
   return (
     <div className="container items-center p-4 mx-auto min-h-screen justify-center">
       <Head>
@@ -62,6 +75,8 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
               <th className="w-1/2 px-4 py-2">Partner Id</th>
               <th className="w-1/4 px-4 py-2">Order Id</th>
               <th className="w-1/4 px-4 py-2">Status</th>
+              <th className="w-1/4 px-4 py-2">Created Datetime</th>
+              <th className="w-1/4 px-4 py-2">Modified Datetime</th>
             </tr>
           </thead>
           <tbody>
@@ -69,15 +84,25 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
           </tbody>
         </table>
       </div>
-      <div className="p-3">
-        <h3 className="py-2 text-blue-700">Debug</h3>
+      <div className="flex text-sm">
+        <h4>Legend:</h4>
+        <div className={"mx-1 px-1 bg-blue-500"}>
+          Preparing / Order Placed
+        </div>
+        <div className={"mx-1 px-1 bg-green-500"}>
+          Ready
+        </div>
+      </div>
+      <div className="p-3 text-blue-700">
+        <h3 className="py-2">Debug</h3>
+        <div className="text-sm">Update Status: {isFetchingOrder?"Getting latest Update":"Stable"}</div>
         <span>{lastestMessage}</span>
       </div>
     </div>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async (context) => {
   const {
     USER_ID,
     BACKEND_SERVER
@@ -87,7 +112,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       baseUrl: BACKEND_SERVER,
       userId: USER_ID
-    },
+    }
   }
 };
 

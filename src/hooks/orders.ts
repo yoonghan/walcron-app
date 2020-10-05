@@ -5,6 +5,11 @@ export function withOrders(baseUrl:string, userId:string) {
   const [orders, setOrders] = useState([]);
 
   const fetchOrder = () => {
+    if(isFetchingOrder) {
+      return;
+    }
+
+    setIsFetchingOrder(true);
     fetch(`${baseUrl}/app/api/locker/users/${userId}/orders`, {
       method: 'GET',
       headers: {
@@ -13,6 +18,7 @@ export function withOrders(baseUrl:string, userId:string) {
     })
     .then(orderResp => (orderResp.json()))
     .then(orderResp => {
+      setIsFetchingOrder(false);
       if(orderResp.orders) {
         setOrders(orderResp.orders);
       }
@@ -20,16 +26,15 @@ export function withOrders(baseUrl:string, userId:string) {
         setOrders([]);
       }
     })
-    .catch(err => console.error('order error', err));
+    .catch(err => {
+      console.error('order error', err);
+      setIsFetchingOrder(false);
+    });
   }
 
-  useEffect(() => {
-    if(isFetchingOrder) {
-      return;
-    }
-
+  const _doOrderFetch = () => {
     fetchOrder();
-  }, [isFetchingOrder]);
+  }
 
   useEffect(() => {
     fetchOrder();
@@ -37,6 +42,7 @@ export function withOrders(baseUrl:string, userId:string) {
 
   return {
     orders: orders,
-    updateOrders: () => {setIsFetchingOrder(true)}
+    isFetchingOrder: isFetchingOrder,
+    updateOrders: _doOrderFetch
   };
 }

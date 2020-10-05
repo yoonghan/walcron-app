@@ -2,29 +2,27 @@ import {useState, useEffect, useMemo} from 'react';
 import firebase from 'firebase/app';
 import 'firebase/messaging';
 
+interface INotificationData {
+  orderId: string,
+  status: string,
+  partnerId: string
+}
+
 export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
   const [firebaseMessaging, setFirebaseMessaging] = useState(null);
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [isPermissionRequired, setIsPermissionRequired] = useState(false);
   const [lastestMessage, setLatestMessage] = useState("");
-  const [lastestData, setLatestData] = useState({});
+  const [lastestData, setLatestData] = useState<INotificationData|undefined>(undefined);
 
   useEffect(() => {
     if(firebaseMessaging !== null && isPushEnabled) {
       console.log("registered to message listener");
       firebaseMessaging.onMessage((payload) => {
         const notification = payload.notification;
-        const data = payload.data;
-        
-        console.log('notification', payload);
-        // try {
-        //   if(notification.title.indexOf('ready') > -1) {
-            setLatestMessage(notification.body);
-            setLatestData(data);
-        //   }
-        // }catch(err) {
-        //
-        // }
+        const data = (payload.data as INotificationData);
+        setLatestMessage(notification.body);
+        setLatestData(data);
       });
     }
   }, [firebaseMessaging, isPushEnabled]);
