@@ -5,7 +5,7 @@ withOffline(
   {
     target: 'serverless',
     transformManifest: manifest => ['/'].concat(manifest), // add the homepage to the cache
-    generateInDevMode: true,
+    generateInDevMode: false,
     workboxOpts: {
       swDest: 'static/service-worker.js',
       runtimeCaching: [
@@ -25,6 +25,10 @@ withOffline(
           },
         },
       ],
+    },
+    env: {
+      USER_ID: process.env.USER_ID,
+      BACKEND_SERVER: process.env.BACKEND_SERVER
     }
   }
 );

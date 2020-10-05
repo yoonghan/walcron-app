@@ -3,7 +3,7 @@ import {useState, useEffect, useMemo} from 'react';
 export function withPwaHooks() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [pwaPromptEvent, setPwaPromptEvent] = useState(null);
-  const [isSafari, setIsSafari] = React.useState(false);
+  const [isSafari, setIsSafari] = useState(false);
 
   const addToShortcutEvent = (e:any) => {
     e.preventDefault();

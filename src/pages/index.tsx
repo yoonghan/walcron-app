@@ -32,7 +32,7 @@ export default function Home() {
 
         <section className="p-3 flex flex-col md:flex-row justify-center">
           <div className="md:max-w-md">
-            <IconBox href="/lockers">
+            <IconBox href="/locker">
               <div className="flex flex-col justify-center text-center items-center">
                 <FontAwesomeIcon icon={['fas', 'lock']} />
                 <h3 className="pt-3">Food Lockers</h3>

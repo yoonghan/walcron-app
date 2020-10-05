@@ -6,5 +6,9 @@
       "source": "/service-worker.js",
       "destination": "/_next/static/service-worker.js"
     }
-  ]
+  ],
+  "env": {
+    "USER_ID": "1",
+    "BACKEND_SERVER": "https://service.walcron.com"
+  }
 }
