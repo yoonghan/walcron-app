@@ -10,6 +10,7 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
   const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(baseUrl, userId);
   const {orders, updateOrders, isFetchingOrder} = withOrders(baseUrl, userId);
   const [myOrders, setMyOrders] = useState([]);
+  const updateIntervalInSeconds = 10000;
 
   const _drawnOrders = useMemo(() => {
     if(myOrders) {
@@ -25,6 +26,16 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
     }
     return (<></>);
   }, [myOrders]);
+
+  useEffect(() => {
+    console.log('isPushEnabled', isPushEnabled);
+    if(isPushEnabled === false) {
+      console.log('update via intervals');
+      setInterval(() => {
+        updateOrders();
+      }, updateIntervalInSeconds);
+    }
+  }, [isPushEnabled]);
 
   useEffect(() => {
     const currentOrders = [...orders];

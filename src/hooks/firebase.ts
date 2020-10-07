@@ -10,9 +10,10 @@ interface INotificationData {
 
 export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
   const [firebaseMessaging, setFirebaseMessaging] = useState(null);
-  const [isPushEnabled, setIsPushEnabled] = useState(false);
+  const [isPushEnabled, setIsPushEnabled] = useState<Boolean|undefined>(undefined);
   const [isPermissionRequired, setIsPermissionRequired] = useState(false);
   const [lastestMessage, setLatestMessage] = useState("");
+  const [isIOSDevice, updateAsIOSDevice] = useState(false);
   const [lastestData, setLatestData] = useState<INotificationData|undefined>(undefined);
 
   useEffect(() => {
@@ -64,11 +65,19 @@ export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
       messagingSenderId: "1028008017896",
       appId: "1:1028008017896:web:2e97eeb079938636e02e5d"
     };
-    firebase.initializeApp(firebaseConf);
-    const messaging = firebase.messaging();
-    _updateToken(messaging)();
+    try {
+      firebase.initializeApp(firebaseConf);
+      const messaging = firebase.messaging();
+      _updateToken(messaging)();
 
-    messaging.onTokenRefresh(_updateToken(messaging));
+      messaging.onTokenRefresh(_updateToken(messaging));
+    }
+    catch(err) {
+      if(err.message.indexOf('duplicate-app') === -1) {
+        alert("Firebase is not supported on iOS browser/related devices.\nThere will be no notification update.");
+        setIsPushEnabled(false);
+      }
+    }
   }, []);
 
   return {
