@@ -3,8 +3,9 @@ import {SFC, useState, useEffect, useMemo} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconBox from '../components/IconBox';
 import {withPwaHooks} from '../hooks/pwa';
+import { GetStaticProps } from 'next';
 
-const Index:SFC<any> = ({backendServer}) => {
+const Index:SFC<any> = ({baseUrl}) => {
   const [ready, updateReady] = useState(false);
   const [retryCounter, setRetryCounter] = useState(0);
   const {isInstallable, drawnPwaButton} = withPwaHooks();
@@ -13,7 +14,7 @@ const Index:SFC<any> = ({backendServer}) => {
   const allowedRetries = 5;
 
   const _doMonitorCheck = () => {
-    fetch(`${backendServer}/api/monitor`, {
+    fetch(`${baseUrl}/api/monitor`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -97,7 +98,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: {
-      backendServer: BACKEND_SERVER
+      baseUrl: BACKEND_SERVER
     }
   }
 }
