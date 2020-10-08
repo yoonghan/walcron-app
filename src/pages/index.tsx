@@ -1,11 +1,55 @@
 import Head from 'next/head';
+import {SFC, useState, useEffect, useMemo} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconBox from '../components/IconBox';
 import {withPwaHooks} from '../hooks/pwa';
 
-export default function Home() {
-
+const Index:SFC<any> = ({backendServer}) => {
+  const [ready, updateReady] = useState(false);
+  const [retryCounter, setRetryCounter] = useState(0);
   const {isInstallable, drawnPwaButton} = withPwaHooks();
+
+  const retryWaitInterval = 5000;
+  const allowedRetries = 5;
+
+  const _doMonitorCheck = () => {
+    fetch(`${backendServer}/api/monitor`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      referrerPolicy: 'no-referrer'
+    })
+    .then(resp => (resp.json()))
+    .then(resp => { updateReady(resp.status === 'ok') })
+    .catch(err => { updateReady(false)})
+    .finally(() => {
+      setRetryCounter(retryCounter + 1);
+    })
+  }
+
+  useEffect(() => {
+    if(!ready && retryCounter < allowedRetries) {
+      setTimeout(_doMonitorCheck, retryWaitInterval)
+    }
+  }, [retryCounter, ready]);
+
+  useEffect(() => {
+    _doMonitorCheck()
+  }, []);
+
+  const _drawnMessage = useMemo(() => {
+    if(ready) {
+      return <span>Please choose the application which you would like to execute.</span>
+    }
+
+    if(retryCounter < allowedRetries) {
+      return <span><em className="animate-blink">PLEASE WAIT: </em> Warming up and getting server ready.</span>
+    }
+    else {
+      return <span><em className="text-red-500">ERROR: </em> Exhausted retry, maybe a refresh may help.</span>
+    }
+  }, [retryCounter, ready])
 
   return (
     <div className="container flex items-center p-4 mx-auto min-h-screen justify-center">
@@ -26,13 +70,13 @@ export default function Home() {
 
         <hr/>
 
-        <article className="my-4 text-center">
-          <span>Please choose the application which you would like to execute.</span>
-        </article>
+        <div className="my-4 text-center">
+          {_drawnMessage}
+        </div>
 
         <section className="p-3 flex flex-col md:flex-row justify-center">
           <div className="md:max-w-md">
-            <IconBox href="/locker">
+            <IconBox href="/locker" disabled={!ready}>
               <div className="flex flex-col justify-center text-center items-center">
                 <FontAwesomeIcon icon={['fas', 'lock']} />
                 <h3 className="pt-3">Food Lockers</h3>
@@ -41,6 +85,21 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <div className={"text-red-500"}></div>
     </div>
   )
 }
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const {
+    BACKEND_SERVER
+  } = process.env;
+
+  return {
+    props: {
+      backendServer: BACKEND_SERVER
+    }
+  }
+}
+
+export default Index;
