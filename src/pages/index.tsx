@@ -35,10 +35,6 @@ const Index:SFC<any> = ({baseUrl}) => {
     }
   }, [retryCounter, ready]);
 
-  useEffect(() => {
-    _doMonitorCheck()
-  }, []);
-
   const _drawnMessage = useMemo(() => {
     if(ready) {
       return <span>Please choose the application which you would like to execute.</span>
