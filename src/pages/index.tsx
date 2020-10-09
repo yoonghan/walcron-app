@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import {SFC, useState, useEffect, useMemo} from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Icon from '../components/Icon';
 import IconBox from '../components/IconBox';
 import {withPwaHooks} from '../hooks/pwa';
 import { GetStaticProps } from 'next';
@@ -79,7 +79,7 @@ const Index:SFC<any> = ({baseUrl}) => {
           <div className="md:max-w-md">
             <IconBox href="/locker" disabled={!ready}>
               <div className="flex flex-col justify-center text-center items-center">
-                <FontAwesomeIcon icon={['fas', 'lock']} />
+                <Icon icon={['fas', 'lock']} size="lg" width="16"/>
                 <h3 className="pt-3">Food Lockers</h3>
               </div>
             </IconBox>
