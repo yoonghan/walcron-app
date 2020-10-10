@@ -16,11 +16,11 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
     if(myOrders) {
       return myOrders.map((elem, idx) => (
         <tr key={`order${idx}-${elem.orderId}`}>
-          <td className="border px-4 py-2">{elem.lastModifiedDateTime}</td>
-          <td className={`border px-4 py-2 ${elem.status==='Ready'?'bg-green-500':'bg-blue-500'}`}>{elem.status}</td>
           <td className="border px-4 py-2">{elem.partnerId}</td>
           <td className="border px-4 py-2">{elem.orderId}</td>
+          <td className={`border px-4 py-2 ${elem.status==='Ready'?'bg-green-500':'bg-blue-500'}`}>{elem.status}</td>
           <td className="border px-4 py-2">{elem.createdDateTime}</td>
+          <td className="border px-4 py-2">{elem.lastModifiedDateTime}</td>
         </tr>
       ))
     }
