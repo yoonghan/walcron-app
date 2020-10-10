@@ -14,7 +14,7 @@ const Index:SFC<any> = ({baseUrl}) => {
   const allowedRetries = 5;
 
   const _doMonitorCheck = () => {
-    fetch(`${baseUrl}/api/monitor`, {
+    fetch(`${baseUrl}/app/api/monitor`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
