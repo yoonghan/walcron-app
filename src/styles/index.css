@@ -7,10 +7,6 @@
 /* purgecss end ignore */
 @import 'tailwindcss/utilities';
 
-html {
-  font-size: 14pt;
-}
-
 .icon {
   width: 20px;
   display: inline;

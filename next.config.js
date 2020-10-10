@@ -29,6 +29,21 @@ withOffline(
     env: {
       USER_ID: process.env.USER_ID,
       BACKEND_SERVER: process.env.BACKEND_SERVER
+    },
+    async headers() {
+      return [{
+          source: '/:base',
+          headers: [
+            {
+              key: 'Link',
+              value: '</css/main.css>; rel=preload; as=style'
+            },
+            {
+              key : 'Cache-Control',
+              value : 'public, max-age=31536000, immutable'
+            }
+          ]
+      }]
     }
   }
 );
