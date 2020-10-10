@@ -30,8 +30,13 @@ const Index:SFC<any> = ({baseUrl}) => {
   }
 
   useEffect(() => {
-    if(!ready && retryCounter < allowedRetries) {
-      setTimeout(_doMonitorCheck, retryWaitInterval)
+    if(!ready) {
+      if(retryCounter === 0) {
+        _doMonitorCheck()
+      }
+      else if(retryCounter < allowedRetries) {
+        setTimeout(_doMonitorCheck, retryWaitInterval)
+      }
     }
   }, [retryCounter, ready]);
 
