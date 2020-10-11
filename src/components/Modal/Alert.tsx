@@ -12,7 +12,7 @@ interface IModalAlert {
   callbackOkClick: () => void;
 }
 
-const ModalAlert:SFC<IModalConfirm> = ({isOpen, title, message, confirmButtonText, btnColor, callbackOkClick}) => {
+const ModalAlert:SFC<IModalAlert> = ({isOpen, title, message, confirmButtonText, btnColor, callbackOkClick}) => {
   return (
     <div className="fixed z-10 inset-0 overflow-y-auto">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">

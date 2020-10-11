@@ -87,7 +87,7 @@ const Index:SFC<any> = ({baseUrl}) => {
           </div>
         </section>
       </main>
-      <div className={"text-red-500"}></div>
+      <div className={"text-red-500 bg-red-600 hover:bg-red-500 focus:bg-red-700 focus:shadow-outline-red"}></div>
     </div>
   )
 }
