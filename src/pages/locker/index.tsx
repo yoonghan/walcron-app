@@ -115,6 +115,7 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
   useEffect(() => {
     console.log('isPushEnabled', isPushEnabled);
     if(isPushEnabled === false) {
+      console.log('update via intervals');
       timedUpdate = setInterval(() => {
         updateOrders();
       }, updateIntervalInSeconds);
