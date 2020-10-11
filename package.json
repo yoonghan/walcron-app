@@ -9,6 +9,7 @@
     "sitemap": "node site_map_generator.js"
   },
   "dependencies": {
+    "@headlessui/react": "^0.2.0",
     "next": "9.5.3",
     "react": "16.13.1",
     "react-dom": "16.13.1"

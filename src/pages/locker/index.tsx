@@ -1,4 +1,4 @@
-import {SFC, useEffect, useState, useMemo} from 'react';
+import {SFC, useEffect, useState, useMemo, useCallback} from 'react';
 import Head from 'next/head';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconBox from '../../components/IconBox';
@@ -6,6 +6,8 @@ import Button from '../../components/Button';
 import {withFirebaseCloudMessaging} from '../../hooks/firebase';
 import {withOrders} from '../../hooks/orders';
 import { GetStaticProps } from 'next';
+import ModalConfirm from '../../components/Modal/Confirm';
+import ModalAlert from '../../components/Modal/Alert';
 
 interface ILockInformation {
   orderId: string;
@@ -14,12 +16,16 @@ interface ILockInformation {
 }
 
 const Locker:SFC<any> = ({baseUrl, userId}) => {
+  let timedUpdate:any = undefined;
   const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(baseUrl, userId);
   const {orders, updateOrders, isFetchingOrder} = withOrders(baseUrl, userId);
   const [myOrders, setMyOrders] = useState([]);
   const [requestedPin, updateRequestedPin] = useState<ILockInformation|undefined>(undefined);
   const [isRetrieving, setIsRetrieving] = useState(false);
   const updateIntervalInSeconds = 10000;
+  const [isModalConfirmShow, setModalConfirmShow] = useState(false);
+  const [isModalFailShow, setModalFailShow] = useState(false);
+  const [isModalOkShow, setModalOkShow] = useState(false);
 
   const _getPin = (orderId:string, partnerId:string) => () => {
     setIsRetrieving(true);
@@ -45,7 +51,7 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
         pin: resp.info.pin
       })
     })
-    .catch(err => alert('error'))
+    .catch(err => setModalFailShow(true))
     .finally(() => {
       setIsRetrieving(false);
     })
@@ -63,8 +69,18 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
       })
     })
     .then(resp => resp.json())
-    .then(resp => { alert('Unlock triggered.') })
+    .then(resp => { setModalOkShow(true) })
   }
+
+  const _drawRetrieveCol = (elem:any) => {
+    switch(elem.status) {
+      case 'Ready':
+        return <Button onClick={_getPin(elem.orderId, elem.partnerId)} disabled={isRetrieving}>retrieve</Button>
+      default:
+        return <span> - </span>
+    }
+  }
+
 
   const _drawnOrders = useMemo(() => {
     if(myOrders) {
@@ -75,8 +91,8 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
           <td className={`border px-4 py-2 ${elem.status==='Ready'?'bg-green-500':'bg-blue-500'}`}>{elem.status}</td>
           <td className="border px-4 py-2">{elem.createdDateTime}</td>
           <td className="border px-4 py-2">{elem.lastModifiedDateTime}</td>
-          <td className="border px-4 py-2 bg-yellow-300">
-            <Button onClick={_getPin(elem.orderId, elem.partnerId)} disabled={isRetrieving}>retrieve</Button>
+          <td className="border px-4 py-2">
+            {_drawRetrieveCol(elem)}
           </td>
         </tr>
       ))
@@ -84,23 +100,29 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
     return (<></>);
   }, [myOrders, isRetrieving]);
 
+  const _triggerConfirmCallback = useCallback(() => {
+    _callUnlock(requestedPin.orderId, requestedPin.partnerId, requestedPin.pin);
+    updateRequestedPin(undefined);
+    setModalConfirmShow(false);
+  }, [requestedPin]);
+
   useEffect(() => {
     if(requestedPin) {
-      const unlock = window.confirm('Sure to unlock?');
-      if(unlock) {
-        _callUnlock(requestedPin.orderId, requestedPin.partnerId, requestedPin.pin);
-      }
-      updateRequestedPin(undefined);
+      setModalConfirmShow(true);
     }
-  }, [requestedPin])
+  }, [requestedPin]);
 
   useEffect(() => {
     console.log('isPushEnabled', isPushEnabled);
     if(isPushEnabled === false) {
-      console.log('update via intervals');
-      setInterval(() => {
+      timedUpdate = setInterval(() => {
         updateOrders();
       }, updateIntervalInSeconds);
+    }
+    else {
+      if(timedUpdate) {
+        clearInterval(timedUpdate);
+      }
     }
   }, [isPushEnabled]);
 
@@ -177,6 +199,38 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
         <div className="text-sm">Update Status: {isFetchingOrder?"Getting latest Update":"Stable"}</div>
         <span>{lastestMessage}</span>
       </div>
+      {isModalConfirmShow &&
+        <ModalConfirm
+          title="Unlock?"
+          message="Are you sure you want to unlock this?"
+          confirmButtonText="Unlock"
+          isOpen={isModalConfirmShow}
+          callbackOkClick={_triggerConfirmCallback}
+          callbackCancelClick={() => {setModalConfirmShow(false)}}
+          />
+      }
+      {
+        isModalFailShow &&
+          <ModalAlert
+            title="Can't Unlock"
+            message="Fail to unlock, please call support."
+            confirmButtonText="Ok"
+            btnColor={'red'}
+            isOpen={isModalFailShow}
+            callbackOkClick={() => {setModalFailShow(false)}}
+            />
+      }
+      {
+        isModalOkShow &&
+          <ModalAlert
+            title="Unlocked"
+            message="Successfully unlocked for your order!"
+            confirmButtonText="Ok"
+            btnColor={'blue'}
+            isOpen={isModalOkShow}
+            callbackOkClick={() => {setModalOkShow(false)}}
+            />
+      }
     </div>
   )
 }
