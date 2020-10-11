@@ -7,11 +7,17 @@ import {withFirebaseCloudMessaging} from '../../hooks/firebase';
 import {withOrders} from '../../hooks/orders';
 import { GetStaticProps } from 'next';
 
+interface ILockInformation {
+  orderId: string;
+  partnerId: string;
+  pin: string
+}
+
 const Locker:SFC<any> = ({baseUrl, userId}) => {
   const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(baseUrl, userId);
   const {orders, updateOrders, isFetchingOrder} = withOrders(baseUrl, userId);
   const [myOrders, setMyOrders] = useState([]);
-  const [requestedPin, updateRequestedPin] = useState<object|undefined>(undefined);
+  const [requestedPin, updateRequestedPin] = useState<ILockInformation|undefined>(undefined);
   const [isRetrieving, setIsRetrieving] = useState(false);
   const updateIntervalInSeconds = 10000;
 

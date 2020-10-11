@@ -1,12 +1,12 @@
 import {SFC} from "react";
 import Link from 'next/link';
 
-export interface ButtonProps {
+export interface IButtonProps {
   onClick: ()=>void;
   disabled?: boolean
 }
 
-const Button: SFC<IconBoxProps> = ({children, onClick, disabled}) => {
+const Button: SFC<IButtonProps> = ({children, onClick, disabled}) => {
   if(!disabled) {
     return (
       <button
