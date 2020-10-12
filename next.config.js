@@ -32,7 +32,7 @@ withOffline(
     },
     async headers() {
       return [{
-          source: '/:base',
+          source: '/',
           headers: [
             {
               key: 'Link',

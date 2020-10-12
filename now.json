@@ -7,6 +7,35 @@
       "destination": "/_next/static/service-worker.js"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers" : [
+        {
+          "key": "Link",
+          "value": "</css/main.css>; rel=preload; as=style"
+        }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers" : [
+        {
+          "key" : "Cache-Control",
+          "value" : "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/pwa/(.*)",
+      "headers" : [
+        {
+          "key" : "Cache-Control",
+          "value" : "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "env": {
   },
   "build": {
