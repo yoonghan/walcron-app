@@ -15,9 +15,9 @@ interface ILockInformation {
   pin: string
 }
 
-const Locker:SFC<any> = ({baseUrl, userId}) => {
+const Locker:SFC<any> = ({baseUrl, userId, firebaseApiKey, firebaseProjectId, firebaseSenderId, firebaseAppId}) => {
   let timedUpdate:any = undefined;
-  const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(baseUrl, userId);
+  const {isPermissionRequired, isPushEnabled, lastestMessage, lastestData} = withFirebaseCloudMessaging(firebaseApiKey, firebaseProjectId, firebaseSenderId, firebaseAppId, baseUrl, userId);
   const {orders, updateOrders, isFetchingOrder} = withOrders(baseUrl, userId);
   const [myOrders, setMyOrders] = useState([]);
   const [requestedPin, updateRequestedPin] = useState<ILockInformation|undefined>(undefined);
@@ -239,13 +239,21 @@ const Locker:SFC<any> = ({baseUrl, userId}) => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const {
     USER_ID,
-    BACKEND_SERVER
+    BACKEND_SERVER,
+    FIREBASE_API_KEY,
+    FIREBASE_PROJECT_ID,
+    FIREBASE_SENDER_ID,
+    FIREBASE_APP_ID
   } = process.env;
 
   return {
     props: {
       baseUrl: BACKEND_SERVER,
-      userId: USER_ID
+      userId: USER_ID,
+      firebaseApiKey: FIREBASE_API_KEY,
+      firebaseProjectId: FIREBASE_PROJECT_ID,
+      firebaseSenderId: FIREBASE_SENDER_ID,
+      firebaseAppId: FIREBASE_APP_ID
     }
   }
 };

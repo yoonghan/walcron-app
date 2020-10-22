@@ -8,7 +8,7 @@ interface INotificationData {
   partnerId: string
 }
 
-export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
+export function withFirebaseCloudMessaging(apiKey:string, projectId:string, messagingSenderId:string, appId:string, baseUrl:string, userId:string) {
   const [firebaseMessaging, setFirebaseMessaging] = useState(null);
   const [isPushEnabled, setIsPushEnabled] = useState<Boolean|undefined>(undefined);
   const [isPermissionRequired, setIsPermissionRequired] = useState(false);
@@ -60,10 +60,10 @@ export function withFirebaseCloudMessaging(baseUrl:string, userId:string) {
 
   useEffect(() => {
     const firebaseConf = {
-      apiKey: "AIzaSyDmW-zt_s96mfkQhU5R26Q9H1UrVsA-GcA",
-      projectId: "locker-db7b0",
-      messagingSenderId: "1028008017896",
-      appId: "1:1028008017896:web:2e97eeb079938636e02e5d"
+      apiKey,
+      projectId,
+      messagingSenderId,
+      appId
     };
     try {
       firebase.initializeApp(firebaseConf);
