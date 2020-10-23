@@ -41,7 +41,7 @@
   "build": {
     "env": {
       "USER_ID": "1",
-      "AUTHPACK_KEY": "abc123",
+      "AUTHPACK_KEY": "wga-client-key-92e85f9cbaf1a329cf0b10fca",
       "BACKEND_SERVER": "https://service.walcron.com",
       "FIREBASE_API_KEY": "AIzaSyDmW-zt_s96mfkQhU5R26Q9H1UrVsA-GcA",
       "FIREBASE_PROJECT_ID" : "locker-db7b0",
