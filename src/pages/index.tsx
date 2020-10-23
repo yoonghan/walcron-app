@@ -4,11 +4,14 @@ import Icon from '../components/Icon';
 import IconBox from '../components/IconBox';
 import {withPwaHooks} from '../hooks/pwa';
 import { GetStaticProps } from 'next';
+import { AuthenticationWrapper } from "../container/authpack";
+import { createAuthpack } from "../utils/authpack";
 
-const Index:SFC<any> = ({baseUrl}) => {
+const Index:SFC<any> = ({baseUrl, authpackKey}) => {
   const [ready, updateReady] = useState(false);
   const [retryCounter, setRetryCounter] = useState(0);
   const {isInstallable, drawnPwaButton} = withPwaHooks();
+  const authpack = createAuthpack(authpackKey);
 
   const retryWaitInterval = 5000;
   const allowedRetries = 5;
@@ -39,6 +42,30 @@ const Index:SFC<any> = ({baseUrl}) => {
       }
     }
   }, [retryCounter, ready]);
+
+  const _drawnAuthenticationButton = useMemo(() => (
+    <AuthenticationWrapper authpack={authpack}>
+      <div className="md:max-w-md w-full">
+        <IconBox onClick={()=>{authpack.open()}}>
+          <div className="flex flex-col justify-center text-center items-center">
+            <Icon icon={['fas', 'lock']} size="lg" width="16"/>
+            <h3 className="pt-3">Login</h3>
+          </div>
+        </IconBox>
+      </div>
+    </AuthenticationWrapper>
+  ), []);
+
+  const _drawnLockerButton = useMemo(() => (
+    <div className="md:max-w-md w-full">
+      <IconBox href="/locker" disabled={!ready}>
+        <div className="flex flex-col justify-center text-center items-center">
+          <Icon icon={['fas', 'utensils']} size="lg" width="16"/>
+          <h3 className="pt-3">Food Lockers</h3>
+        </div>
+      </IconBox>
+    </div>
+  ), [ready]);
 
   const _drawnMessage = useMemo(() => {
     if(ready) {
@@ -77,14 +104,8 @@ const Index:SFC<any> = ({baseUrl}) => {
         </div>
 
         <section className="p-3 flex flex-col md:flex-row justify-center">
-          <div className="md:max-w-md">
-            <IconBox href="/locker" disabled={!ready}>
-              <div className="flex flex-col justify-center text-center items-center">
-                <Icon icon={['fas', 'lock']} size="lg" width="16"/>
-                <h3 className="pt-3">Food Lockers</h3>
-              </div>
-            </IconBox>
-          </div>
+          {_drawnAuthenticationButton}
+          {_drawnLockerButton}
         </section>
       </main>
       <div className={"text-red-500 bg-red-600 hover:bg-red-500 focus:bg-red-700 focus:shadow-outline-red"}></div>
@@ -94,12 +115,15 @@ const Index:SFC<any> = ({baseUrl}) => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const {
-    BACKEND_SERVER
+    BACKEND_SERVER,
+    AUTHPACK_KEY
   } = process.env;
+
 
   return {
     props: {
-      baseUrl: BACKEND_SERVER
+      baseUrl: BACKEND_SERVER,
+      authpackKey: AUTHPACK_KEY
     }
   }
 }
